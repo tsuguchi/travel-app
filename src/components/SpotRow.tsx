@@ -81,6 +81,28 @@ export default function SpotRow({ spot, index, onChange, onDelete }: Props) {
         onChange={(e) => onChange({ memo: e.target.value })}
         className={`${inputClass} mt-2 w-full`}
       />
+
+      <div className="mt-2 flex items-center gap-2">
+        <label className="text-sm font-bold" htmlFor={`cost-${spot.id}`}>
+          費用
+        </label>
+        <input
+          id={`cost-${spot.id}`}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          step={100}
+          value={spot.cost === 0 ? "" : spot.cost}
+          placeholder="0"
+          onChange={(e) =>
+            onChange({
+              cost: e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)),
+            })
+          }
+          className={`${inputClass} w-32 text-right`}
+        />
+        <span className="text-sm text-gray-700">円</span>
+      </div>
     </li>
   );
 }

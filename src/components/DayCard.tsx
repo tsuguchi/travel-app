@@ -3,6 +3,7 @@
 import type { ItineraryDay, Spot } from "@/types";
 import { formatDateJa } from "@/lib/date";
 import { isSortedByTime } from "@/lib/spot";
+import { dayTotalCost, formatYen } from "@/lib/cost";
 import { FIELD_INPUT, OUTLINE_BUTTON } from "@/lib/ui";
 import SpotRow from "@/components/SpotRow";
 
@@ -29,6 +30,7 @@ export default function DayCard({
 }: Props) {
   // 2件以上あり、まだ時刻順でないときだけ並べ替えを促す。
   const canSort = day.spots.length >= 2 && !isSortedByTime(day.spots);
+  const total = dayTotalCost(day);
   return (
     <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -72,6 +74,12 @@ export default function DayCard({
             />
           ))}
         </ul>
+      )}
+
+      {total > 0 && (
+        <p className="mt-2 text-right text-sm font-bold text-gray-800">
+          この日の合計：{formatYen(total)}
+        </p>
       )}
 
       <div className="mt-3 flex flex-wrap gap-2">

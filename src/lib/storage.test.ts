@@ -10,6 +10,7 @@ function makeTrip(over: Partial<Trip> = {}): Trip {
     destination: "京都",
     startDate: "2026-07-10",
     endDate: "2026-07-12",
+    budget: 50000,
     days: [{ id: "d1", date: "2026-07-10", spots: [] }],
     createdAt: 1,
     updatedAt: 2,
@@ -42,6 +43,24 @@ describe("loadTrips の防御的正規化", () => {
     const [trip] = loadTrips();
     expect(trip.days).toEqual([]);
     expect(trip.destination).toBe("");
+    expect(trip.budget).toBe(0);
+  });
+
+  it("不正な budget / cost（文字列・負値）は 0 に正規化する", () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify([
+        {
+          id: "t1",
+          title: "t",
+          budget: "５万円",
+          days: [{ id: "d1", spots: [{ id: "s1", cost: -100 }] }],
+        },
+      ]),
+    );
+    const trip = loadTrips()[0];
+    expect(trip.budget).toBe(0);
+    expect(trip.days[0].spots[0].cost).toBe(0);
   });
 
   it("spot の欠落フィールドを既定値で補う（category は その他）", () => {
@@ -58,6 +77,7 @@ describe("loadTrips の防御的正規化", () => {
       title: "",
       category: "その他",
       memo: "",
+      cost: 0,
     });
   });
 
