@@ -1,5 +1,5 @@
 import type { Trip } from "@/types";
-import { coerceTrips } from "@/lib/storage";
+import { coerceTrips } from "@/lib/normalize";
 
 const EXPORT_FORMAT = "travel-app:trips";
 const EXPORT_VERSION = 1;

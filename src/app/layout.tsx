@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
+import AppChrome from "@/components/AppChrome";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -19,25 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ja"
-      className={`${notoSansJP.variable} h-full antialiased`}
-    >
+    <html lang="ja" className={`${notoSansJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <header className="bg-[#0017c1] text-white print:hidden">
-          <div className="mx-auto w-full max-w-3xl px-4 py-4">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-lg font-bold"
-            >
-              <span aria-hidden="true">🧳</span>
-              旅のしおり
-            </Link>
-          </div>
-        </header>
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
-          {children}
-        </main>
+        <AppChrome>{children}</AppChrome>
         <footer className="mx-auto w-full max-w-3xl px-4 py-6 text-sm text-gray-600 print:hidden">
           旅行計画・しおり作成アプリ
         </footer>
