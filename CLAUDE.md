@@ -13,14 +13,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## コマンド
 
 ```bash
-npm run dev      # 開発サーバー (http://localhost:3000)
-npm run build    # 本番ビルド
-npm run start    # ビルド成果物を起動
-npm run lint     # ESLint (eslint-config-next)
-npx tsc --noEmit # 型チェック（package.json には未登録だが必須）
+npm run dev        # 開発サーバー (http://localhost:3000)
+npm run build      # 本番ビルド
+npm run start      # ビルド成果物を起動
+npm run lint       # ESLint (eslint-config-next)
+npm test           # Vitest（src/**/*.test.ts を1回実行）
+npm run test:watch # Vitest ウォッチモード
+npx tsc --noEmit   # 型チェック（package.json には未登録だが必須）
 ```
 
-テストフレームワークは未導入。変更後は最低限 `npx tsc --noEmit` と `npm run lint` を通すこと。
+テストは Vitest を使用（設定は `vitest.config.ts`、`@/` エイリアス解決済み・environment は node）。対象は純粋関数（`src/lib/date.ts`・`src/lib/spot.ts` 等）。localStorage や DOM に依存するロジックのテストには jsdom 等の追加設定が必要。変更後は最低限 `npx tsc --noEmit`・`npm run lint`・`npm test` を通すこと。
 
 ## アーキテクチャ
 
