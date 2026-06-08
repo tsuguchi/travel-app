@@ -12,7 +12,7 @@ import { PRIMARY_BUTTON } from "@/lib/ui";
  * - サインイン済み → children（アプリ本体）
  */
 export default function AppChrome({ children }: { children: React.ReactNode }) {
-  const { user, ready, configured, signIn, signOut } = useAuth();
+  const { user, ready, configured, error, signIn, signOut } = useAuth();
 
   return (
     <>
@@ -45,7 +45,7 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
         ) : !ready ? (
           <p className="text-gray-600">読み込み中…</p>
         ) : !user ? (
-          <SignIn onSignIn={signIn} />
+          <SignIn onSignIn={signIn} error={error} />
         ) : (
           children
         )}
@@ -54,13 +54,27 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SignIn({ onSignIn }: { onSignIn: () => void }) {
+function SignIn({
+  onSignIn,
+  error,
+}: {
+  onSignIn: () => void;
+  error: string | null;
+}) {
   return (
     <div className="mt-10 rounded-lg border border-gray-200 bg-white p-8 text-center">
       <h1 className="text-xl font-bold">サインインしてください</h1>
       <p className="mt-2 text-gray-700">
         しおりは Google アカウントごとに保存され、複数の端末で同期されます。
       </p>
+      {error && (
+        <p
+          role="alert"
+          className="mx-auto mt-4 max-w-md rounded-md bg-red-50 p-3 text-sm font-bold text-red-700"
+        >
+          {error}
+        </p>
+      )}
       <button type="button" onClick={onSignIn} className={`${PRIMARY_BUTTON} mt-6`}>
         Google でサインイン
       </button>
