@@ -1,5 +1,7 @@
 # 旅のしおり 🧳
 
+🚀 **Live Demo:** https://travel-ac55b.web.app
+
 旅行の計画を立て、日程・予定・費用をまとめた「しおり」を作成・共有できる Web アプリです。
 行き先や日程、各日の予定（時刻・種別・費用）を登録し、予算管理や印刷／PDF 出力、
 データのエクスポート／インポートまで行えます。データは **Firebase（Firestore）** に保存され、
@@ -86,6 +88,18 @@ npm test           # Vitest（1回実行）
 npm run test:watch # Vitest ウォッチ
 npx tsc --noEmit   # 型チェック
 ```
+
+## デプロイ
+
+Next.js の静的エクスポート（`output: "export"`）を **Firebase Hosting**（無料 Spark プランで可）で配信します。
+
+```bash
+npm install -g firebase-tools
+firebase login
+npm run deploy   # next build（out/ 生成）→ firebase deploy --only hosting
+```
+
+公開 URL は `https://travel-ac55b.web.app`。詳しい手順は **[DEPLOY.md](DEPLOY.md)** を参照してください。
 
 ## アーキテクチャ
 

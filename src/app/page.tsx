@@ -16,7 +16,7 @@ export default function HomePage() {
 
   function handleCreate() {
     const id = createTrip();
-    router.push(`/trips/${id}`);
+    router.push(`/trips?id=${id}`);
   }
 
   function handleDelete(id: string, title: string) {
@@ -108,7 +108,7 @@ export default function HomePage() {
               >
                 <div className="flex items-start justify-between gap-3 p-4">
                   <Link
-                    href={`/trips/${trip.id}`}
+                    href={`/trips?id=${trip.id}`}
                     className="min-w-0 flex-1 hover:underline"
                   >
                     <span className="block truncate text-lg font-bold text-[#0017c1]">

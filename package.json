@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "next build && firebase deploy --only hosting"
   },
   "dependencies": {
     "firebase": "^12.14.0",

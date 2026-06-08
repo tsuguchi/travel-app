@@ -14,7 +14,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run dev        # 開発サーバー (http://localhost:3000)
-npm run build      # 本番ビルド
+npm run build      # 本番ビルド（output:"export" のため out/ に静的書き出し）
+npm run deploy     # next build → firebase deploy --only hosting（要 firebase login）
 npm run start      # ビルド成果物を起動
 npm run lint       # ESLint (eslint-config-next)
 npm test           # Vitest（src/**/*.test.ts を1回実行）
@@ -35,7 +36,7 @@ Firestore users/{uid}/trips ⇄ src/lib/tripsStore.ts
               src/lib/useTrips.ts                  src/lib/auth.ts (useAuth: onAuthStateChanged)
    (useSyncExternalStore でストアを購読)        src/components/AppChrome.tsx (認証ゲート + ヘッダー)
                      ↑
-        src/app/page.tsx (一覧) / src/app/trips/[id]/page.tsx (詳細・編集)
+        src/app/page.tsx (一覧) / src/app/trips/page.tsx（?id=） (詳細・編集)
 ```
 
 理解に複数ファイルの読解が要る要点：
