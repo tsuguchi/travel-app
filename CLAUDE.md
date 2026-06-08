@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev        # 開発サーバー (http://localhost:3000)
 npm run build      # 本番ビルド（output:"export" のため out/ に静的書き出し）
-npm run deploy     # next build → firebase deploy --only hosting（要 firebase login）
+npm run deploy     # next build → npx firebase-tools deploy --only hosting（要 npx firebase-tools login）
 npm run start      # ビルド成果物を起動
 npm run lint       # ESLint (eslint-config-next)
 npm test           # Vitest（src/**/*.test.ts を1回実行）

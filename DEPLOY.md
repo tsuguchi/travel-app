@@ -8,12 +8,13 @@
 
 - `FIREBASE_SETUP.md` の設定が済んでいること（`.env.local` に `NEXT_PUBLIC_FIREBASE_*`）。
   ビルド時にこの構成値が静的ファイルへ埋め込まれます。
-- Firebase CLI をインストールしてログイン：
+- Firebase にログイン（初回のみ。グローバルインストール不要、`npx` を使用）：
 
 ```bash
-npm install -g firebase-tools
-firebase login
+npx firebase-tools login
 ```
+
+> グローバルに入れたい場合は `npm install -g firebase-tools` でも可。その場合 `firebase login` / `firebase deploy ...` が使えます（PATH が通っていることが前提）。
 
 ## デプロイ
 
@@ -21,10 +22,10 @@ firebase login
 npm run deploy
 ```
 
-`npm run deploy` は `next build`（`out/` を生成）→ `firebase deploy --only hosting` を実行します。
+`npm run deploy` は `next build`（`out/` を生成）→ `npx firebase-tools deploy --only hosting` を実行します。
 完了すると `Hosting URL: https://travel-ac55b.web.app` が表示されます。
 
-> 手動で行う場合：`npm run build` の後に `firebase deploy --only hosting`。
+> 手動で行う場合：`npm run build` の後に `npx firebase-tools deploy --only hosting`。
 
 ## セキュリティルールも配信する場合
 

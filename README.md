@@ -94,9 +94,8 @@ npx tsc --noEmit   # 型チェック
 Next.js の静的エクスポート（`output: "export"`）を **Firebase Hosting**（無料 Spark プランで可）で配信します。
 
 ```bash
-npm install -g firebase-tools
-firebase login
-npm run deploy   # next build（out/ 生成）→ firebase deploy --only hosting
+npx firebase-tools login   # 初回のみ（グローバルインストール不要）
+npm run deploy             # next build（out/ 生成）→ npx firebase-tools deploy --only hosting
 ```
 
 公開 URL は `https://travel-ac55b.web.app`。詳しい手順は **[DEPLOY.md](DEPLOY.md)** を参照してください。
