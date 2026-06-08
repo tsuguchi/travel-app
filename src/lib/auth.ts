@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
+  getRedirectResult,
   onAuthStateChanged,
-  signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
 } from "firebase/auth";
@@ -55,6 +56,8 @@ export function useAuth() {
   useEffect(() => {
     // 未設定（auth=null）のときは ready の初期値が既に true なので何もしない。
     if (!auth) return;
+    // リダイレクト方式の戻り。失敗時はここでエラーを拾って表示する。
+    getRedirectResult(auth).catch((e) => setError(describeAuthError(e)));
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       setActiveUser(u?.uid ?? null);
@@ -74,19 +77,10 @@ export function useAuth() {
     if (!auth) return;
     setError(null);
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+      // リダイレクト方式：タブ全体で Google へ遷移する。パスキー（WebAuthn）が
+      // トップレベル文脈で動くため、ポップアップ/COOP 由来の失敗を避けられる。
+      await signInWithRedirect(auth, new GoogleAuthProvider());
     } catch (e) {
-      const code =
-        typeof e === "object" && e !== null && "code" in e
-          ? String((e as { code: unknown }).code)
-          : "";
-      // ユーザーが自分でポップアップを閉じた場合はエラー表示しない
-      if (
-        code === "auth/popup-closed-by-user" ||
-        code === "auth/cancelled-popup-request"
-      ) {
-        return;
-      }
       setError(describeAuthError(e));
     }
   }, []);
