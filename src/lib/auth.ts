@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   getRedirectResult,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithRedirect,
   signOut,
@@ -45,6 +46,8 @@ function describeAuthError(err: unknown): string {
       return "ブラウザにポップアップをブロックされました。ポップアップを許可して再度お試しください。";
     case "auth/configuration-not-found":
       return "認証の構成が見つかりません。Authentication を有効化し、プロバイダを設定してください。";
+    case "auth/missing-email":
+      return "メールアドレスを入力してください。";
     case "auth/invalid-email":
       return "メールアドレスの形式が正しくありません。";
     case "auth/missing-password":
@@ -66,6 +69,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!isFirebaseConfigured);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     // 未設定（auth=null）のときは ready の初期値が既に true なので何もしない。
@@ -102,6 +106,7 @@ export function useAuth() {
   const signInEmail = useCallback(async (email: string, password: string) => {
     if (!auth) return;
     setError(null);
+    setNotice(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (e) {
@@ -112,8 +117,23 @@ export function useAuth() {
   const signUpEmail = useCallback(async (email: string, password: string) => {
     if (!auth) return;
     setError(null);
+    setNotice(null);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      setError(describeAuthError(e));
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (email: string) => {
+    if (!auth) return;
+    setError(null);
+    setNotice(null);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setNotice(
+        "パスワード再設定メールを送信しました（登録済みのメールアドレスの場合）。受信箱をご確認ください。",
+      );
     } catch (e) {
       setError(describeAuthError(e));
     }
@@ -129,9 +149,11 @@ export function useAuth() {
     ready,
     configured: isFirebaseConfigured,
     error,
+    notice,
     signIn,
     signInEmail,
     signUpEmail,
+    resetPassword,
     signOut: doSignOut,
   };
 }
