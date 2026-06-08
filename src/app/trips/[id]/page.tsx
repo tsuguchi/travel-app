@@ -7,6 +7,7 @@ import { useTrips } from "@/lib/useTrips";
 import { createId } from "@/lib/id";
 import { enumerateDates, formatDuration } from "@/lib/date";
 import { sortSpotsByTime } from "@/lib/spot";
+import { budgetRemaining, formatYen, tripTotalCost } from "@/lib/cost";
 import { FIELD_INPUT, OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/ui";
 import DayCard from "@/components/DayCard";
 import TripPrintView from "@/components/TripPrintView";
@@ -101,6 +102,7 @@ export default function TripDetailPage() {
       title: "",
       category: "観光",
       memo: "",
+      cost: 0,
     };
     updateSpots(dayId, (spots) => [...spots, spot]);
   }
@@ -121,6 +123,8 @@ export default function TripDetailPage() {
 
   const duration = formatDuration(t.startDate, t.endDate);
   const generatableDays = enumerateDates(t.startDate, t.endDate).length;
+  const totalCost = tripTotalCost(t);
+  const remaining = budgetRemaining(t);
 
   return (
     <div>
@@ -202,6 +206,26 @@ export default function TripDetailPage() {
           <p className="mt-2 text-sm text-gray-700">期間：{duration}</p>
         )}
 
+        <label className="mt-4 block font-bold" htmlFor="trip-budget">
+          予算（円）
+        </label>
+        <input
+          id="trip-budget"
+          type="number"
+          inputMode="numeric"
+          min={0}
+          step={1000}
+          value={trip.budget === 0 ? "" : trip.budget}
+          placeholder="例：50000"
+          onChange={(e) =>
+            updateTrip(trip.id, {
+              budget:
+                e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)),
+            })
+          }
+          className={fieldInputClass}
+        />
+
         {generatableDays > 0 && (
           <div className="mt-4">
             <button
@@ -215,6 +239,26 @@ export default function TripDetailPage() {
               各日に日付を振り直します。入力済みの予定は引き継がれます。
             </p>
           </div>
+        )}
+      </section>
+
+      {/* 費用サマリ */}
+      <section className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+        <h2 className="font-bold">費用</h2>
+        <p className="mt-1 text-lg">
+          合計：<span className="font-bold">{formatYen(totalCost)}</span>
+        </p>
+        {trip.budget > 0 && (
+          <p
+            className={`mt-1 text-sm font-bold ${
+              remaining < 0 ? "text-red-700" : "text-green-800"
+            }`}
+          >
+            予算 {formatYen(trip.budget)} ／{" "}
+            {remaining < 0
+              ? `${formatYen(-remaining)} 超過`
+              : `残り ${formatYen(remaining)}`}
+          </p>
         )}
       </section>
 

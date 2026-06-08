@@ -32,6 +32,7 @@ export function useTrips() {
       destination: "",
       startDate: "",
       endDate: "",
+      budget: 0,
       days: [{ id: createId(), date: "", spots: [] }],
       createdAt: now,
       updatedAt: now,

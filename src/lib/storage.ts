@@ -13,6 +13,7 @@ function normalizeTrip(raw: Record<string, unknown>): Trip {
     destination: typeof raw.destination === "string" ? raw.destination : "",
     startDate: typeof raw.startDate === "string" ? raw.startDate : "",
     endDate: typeof raw.endDate === "string" ? raw.endDate : "",
+    budget: toFiniteNumber(raw.budget),
     days,
     createdAt: typeof raw.createdAt === "number" ? raw.createdAt : 0,
     updatedAt: typeof raw.updatedAt === "number" ? raw.updatedAt : 0,
@@ -36,7 +37,15 @@ function normalizeSpot(raw: unknown): Spot {
     title: typeof s.title === "string" ? s.title : "",
     category: typeof s.category === "string" ? (s.category as Spot["category"]) : "その他",
     memo: typeof s.memo === "string" ? s.memo : "",
+    cost: toFiniteNumber(s.cost),
   };
+}
+
+/** 有限な数値だけ受け入れ、それ以外（文字列・NaN・Infinity・負値）は 0 にする。 */
+function toFiniteNumber(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : 0;
 }
 
 /**

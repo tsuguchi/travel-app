@@ -3,7 +3,7 @@ import type { Spot } from "@/types";
 import { isSortedByTime, sortSpotsByTime } from "@/lib/spot";
 
 function spot(id: string, time: string): Spot {
-  return { id, time, title: id, category: "観光", memo: "" };
+  return { id, time, title: id, category: "観光", memo: "", cost: 0 };
 }
 
 describe("sortSpotsByTime", () => {

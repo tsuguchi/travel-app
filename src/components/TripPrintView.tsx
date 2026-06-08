@@ -1,6 +1,7 @@
 import type { Trip } from "@/types";
 import { formatDateJa, formatDuration } from "@/lib/date";
 import { CATEGORY_STYLE } from "@/lib/category";
+import { budgetRemaining, dayTotalCost, formatYen, tripTotalCost } from "@/lib/cost";
 
 /**
  * 印刷・PDF 用の読み取り専用ビュー。画面では非表示（hidden）にし、
@@ -8,6 +9,8 @@ import { CATEGORY_STYLE } from "@/lib/category";
  */
 export default function TripPrintView({ trip }: { trip: Trip }) {
   const duration = formatDuration(trip.startDate, trip.endDate);
+  const totalCost = tripTotalCost(trip);
+  const remaining = budgetRemaining(trip);
   return (
     <div className="hidden text-black print:block">
       <h1 className="text-2xl font-bold">{trip.title || "（無題のしおり）"}</h1>
@@ -42,6 +45,11 @@ export default function TripPrintView({ trip }: { trip: Trip }) {
                       {CATEGORY_STYLE[spot.category].icon}{" "}
                     </span>
                     {spot.title || "（無題）"}
+                    {spot.cost > 0 && (
+                      <span className="ml-1 tabular-nums">
+                        （{formatYen(spot.cost)}）
+                      </span>
+                    )}
                     {spot.memo && (
                       <span className="block text-sm text-gray-700">
                         {spot.memo}
@@ -52,8 +60,25 @@ export default function TripPrintView({ trip }: { trip: Trip }) {
               ))}
             </ul>
           )}
+          {dayTotalCost(day) > 0 && (
+            <p className="mt-1 text-right text-sm font-bold">
+              小計：{formatYen(dayTotalCost(day))}
+            </p>
+          )}
         </section>
       ))}
+
+      <section className="mt-4 break-inside-avoid border-t border-black pt-2">
+        <p className="text-right font-bold">合計：{formatYen(totalCost)}</p>
+        {trip.budget > 0 && (
+          <p className="text-right text-sm">
+            予算 {formatYen(trip.budget)} ／{" "}
+            {remaining < 0
+              ? `${formatYen(-remaining)} 超過`
+              : `残り ${formatYen(remaining)}`}
+          </p>
+        )}
+      </section>
     </div>
   );
 }

@@ -21,6 +21,8 @@ export interface Spot {
   category: SpotCategory;
   /** 補足メモ。 */
   memo: string;
+  /** 費用（円）。未入力は 0。 */
+  cost: number;
 }
 
 /** 旅程の1日分。 */
@@ -40,6 +42,8 @@ export interface Trip {
   startDate: string;
   /** 帰着日。"2026-07-03" 形式。 */
   endDate: string;
+  /** 旅行全体の予算（円）。未設定は 0。 */
+  budget: number;
   days: ItineraryDay[];
   /** 作成・更新時刻（エポックミリ秒）。一覧の並び替えに使う。 */
   createdAt: number;
