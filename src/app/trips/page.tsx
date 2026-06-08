@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { ItineraryDay, Spot } from "@/types";
 import { useTrips } from "@/lib/useTrips";
@@ -14,10 +15,11 @@ import TripPrintView from "@/components/TripPrintView";
 
 const fieldInputClass = `mt-1 w-full ${FIELD_INPUT}`;
 
-export default function TripDetailPage() {
-  const params = useParams<{ id: string }>();
+function TripDetail() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const { trips, loaded, updateTrip } = useTrips();
-  const trip = trips.find((t) => t.id === params.id);
+  const trip = trips.find((t) => t.id === id);
 
   if (!loaded) {
     return <p className="text-gray-600">読み込み中…</p>;
@@ -289,5 +291,14 @@ export default function TripDetailPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+// useSearchParams は Suspense 境界が必要（静的エクスポート対応）。
+export default function TripDetailPage() {
+  return (
+    <Suspense fallback={<p className="text-gray-600">読み込み中…</p>}>
+      <TripDetail />
+    </Suspense>
   );
 }
