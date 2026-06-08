@@ -2,6 +2,7 @@
 
 import type { ItineraryDay, Spot } from "@/types";
 import { formatDateJa } from "@/lib/date";
+import { isSortedByTime } from "@/lib/spot";
 import { FIELD_INPUT, OUTLINE_BUTTON } from "@/lib/ui";
 import SpotRow from "@/components/SpotRow";
 
@@ -11,6 +12,7 @@ type Props = {
   onChangeDate: (date: string) => void;
   onDeleteDay: () => void;
   onAddSpot: () => void;
+  onSortSpots: () => void;
   onChangeSpot: (spotId: string, patch: Partial<Spot>) => void;
   onDeleteSpot: (spotId: string) => void;
 };
@@ -21,9 +23,12 @@ export default function DayCard({
   onChangeDate,
   onDeleteDay,
   onAddSpot,
+  onSortSpots,
   onChangeSpot,
   onDeleteSpot,
 }: Props) {
+  // 2件以上あり、まだ時刻順でないときだけ並べ替えを促す。
+  const canSort = day.spots.length >= 2 && !isSortedByTime(day.spots);
   return (
     <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -69,13 +74,20 @@ export default function DayCard({
         </ul>
       )}
 
-      <button
-        type="button"
-        onClick={onAddSpot}
-        className={`mt-3 ${OUTLINE_BUTTON}`}
-      >
-        ＋ 予定を追加
-      </button>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button type="button" onClick={onAddSpot} className={OUTLINE_BUTTON}>
+          ＋ 予定を追加
+        </button>
+        {canSort && (
+          <button
+            type="button"
+            onClick={onSortSpots}
+            className={OUTLINE_BUTTON}
+          >
+            時刻順に並べ替え
+          </button>
+        )}
+      </div>
     </section>
   );
 }

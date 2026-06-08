@@ -6,6 +6,7 @@ import type { ItineraryDay, Spot } from "@/types";
 import { useTrips } from "@/lib/useTrips";
 import { createId } from "@/lib/id";
 import { enumerateDates, formatDuration } from "@/lib/date";
+import { sortSpotsByTime } from "@/lib/spot";
 import { FIELD_INPUT, OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/ui";
 import DayCard from "@/components/DayCard";
 
@@ -113,6 +114,10 @@ export default function TripDetailPage() {
     updateSpots(dayId, (spots) => spots.filter((s) => s.id !== spotId));
   }
 
+  function sortSpots(dayId: string) {
+    updateSpots(dayId, sortSpotsByTime);
+  }
+
   const duration = formatDuration(t.startDate, t.endDate);
   const generatableDays = enumerateDates(t.startDate, t.endDate).length;
 
@@ -210,6 +215,7 @@ export default function TripDetailPage() {
             onChangeDate={(date) => changeDayDate(day.id, date)}
             onDeleteDay={() => deleteDay(day.id)}
             onAddSpot={() => addSpot(day.id)}
+            onSortSpots={() => sortSpots(day.id)}
             onChangeSpot={(spotId, patch) => changeSpot(day.id, spotId, patch)}
             onDeleteSpot={(spotId) => deleteSpot(day.id, spotId)}
           />
