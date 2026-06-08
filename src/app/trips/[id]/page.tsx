@@ -9,6 +9,7 @@ import { enumerateDates, formatDuration } from "@/lib/date";
 import { sortSpotsByTime } from "@/lib/spot";
 import { FIELD_INPUT, OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/ui";
 import DayCard from "@/components/DayCard";
+import TripPrintView from "@/components/TripPrintView";
 
 const fieldInputClass = `mt-1 w-full ${FIELD_INPUT}`;
 
@@ -123,13 +124,26 @@ export default function TripDetailPage() {
 
   return (
     <div>
-      <Link href="/" className="text-sm text-[#0017c1] underline">
-        ← 一覧へ戻る
-      </Link>
+      {/* 印刷・PDF 用の読み取りビュー（画面では非表示） */}
+      <TripPrintView trip={t} />
 
-      <h1 className="mt-3 text-2xl font-bold">
-        {trip.title || "（無題のしおり）"}
-      </h1>
+      <div className="print:hidden">
+        <div className="flex items-center justify-between gap-2">
+          <Link href="/" className="text-sm text-[#0017c1] underline">
+            ← 一覧へ戻る
+          </Link>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className={OUTLINE_BUTTON}
+          >
+            印刷 / PDF保存
+          </button>
+        </div>
+
+        <h1 className="mt-3 text-2xl font-bold">
+          {trip.title || "（無題のしおり）"}
+        </h1>
 
       {/* 基本情報 */}
       <section className="mt-3 rounded-lg border border-gray-200 bg-white p-4">
@@ -222,13 +236,14 @@ export default function TripDetailPage() {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={addDay}
-        className={`mt-4 ${PRIMARY_BUTTON}`}
-      >
-        ＋ 日を追加
-      </button>
+        <button
+          type="button"
+          onClick={addDay}
+          className={`mt-4 ${PRIMARY_BUTTON}`}
+        >
+          ＋ 日を追加
+        </button>
+      </div>
     </div>
   );
 }

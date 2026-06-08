@@ -24,7 +24,7 @@ export default function RootLayout({
       className={`${notoSansJP.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="bg-[#0017c1] text-white">
+        <header className="bg-[#0017c1] text-white print:hidden">
           <div className="mx-auto w-full max-w-3xl px-4 py-4">
             <Link
               href="/"
@@ -38,7 +38,7 @@ export default function RootLayout({
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
           {children}
         </main>
-        <footer className="mx-auto w-full max-w-3xl px-4 py-6 text-sm text-gray-600">
+        <footer className="mx-auto w-full max-w-3xl px-4 py-6 text-sm text-gray-600 print:hidden">
           旅行計画・しおり作成アプリ
         </footer>
       </body>
