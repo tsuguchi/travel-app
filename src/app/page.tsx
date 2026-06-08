@@ -1,14 +1,18 @@
 "use client";
 
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTrips } from "@/lib/useTrips";
 import { formatDateJa, formatDuration } from "@/lib/date";
-import { PRIMARY_BUTTON } from "@/lib/ui";
+import { exportTripsJson, parseTripsJson } from "@/lib/transfer";
+import { OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/ui";
 
 export default function HomePage() {
   const router = useRouter();
-  const { trips, loaded, createTrip, deleteTrip, duplicateTrip } = useTrips();
+  const { trips, loaded, createTrip, deleteTrip, duplicateTrip, importTrips } =
+    useTrips();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleCreate() {
     const id = createTrip();
@@ -21,17 +25,63 @@ export default function HomePage() {
     }
   }
 
+  function handleExport() {
+    const json = exportTripsJson(trips, new Date().toISOString());
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `travel-app-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleImportFile(file: File) {
+    const text = await file.text();
+    const incoming = parseTripsJson(text);
+    if (incoming.length === 0) {
+      window.alert(
+        "取り込めるしおりが見つかりませんでした。ファイルの形式をご確認ください。",
+      );
+      return;
+    }
+    const count = importTrips(incoming);
+    window.alert(`${count}件のしおりを取り込みました。`);
+  }
+
   return (
     <div>
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">しおり一覧</h1>
-        <button
-          type="button"
-          onClick={handleCreate}
-          className={PRIMARY_BUTTON}
-        >
-          ＋ 新しいしおり
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={OUTLINE_BUTTON}
+          >
+            インポート
+          </button>
+          {trips.length > 0 && (
+            <button type="button" onClick={handleExport} className={OUTLINE_BUTTON}>
+              エクスポート
+            </button>
+          )}
+          <button type="button" onClick={handleCreate} className={PRIMARY_BUTTON}>
+            ＋ 新しいしおり
+          </button>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          aria-hidden="true"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleImportFile(file);
+            e.target.value = "";
+          }}
+        />
       </div>
 
       {!loaded ? (

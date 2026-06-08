@@ -60,24 +60,31 @@ function canUseStorage(): boolean {
   }
 }
 
+/**
+ * 任意の値を安全な Trip 配列へ変換する。
+ * 配列でなければ空配列。id・title を持つ要素だけ採用し、欠落は既定値で補う。
+ * localStorage 読み込みと外部 JSON インポートの両方で使う。
+ */
+export function coerceTrips(parsed: unknown): Trip[] {
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .filter(
+      (t): t is Record<string, unknown> =>
+        typeof t === "object" &&
+        t !== null &&
+        typeof (t as Record<string, unknown>).id === "string" &&
+        typeof (t as Record<string, unknown>).title === "string",
+    )
+    .map(normalizeTrip);
+}
+
 /** 保存済みの全しおりを読み込む。壊れたデータは無視して空配列を返す。 */
 export function loadTrips(): Trip[] {
   if (!canUseStorage()) return [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    // id と title を持つものだけ採用し、欠落フィールドは既定値で補う。
-    return parsed
-      .filter(
-        (t): t is Record<string, unknown> =>
-          typeof t === "object" &&
-          t !== null &&
-          typeof (t as Record<string, unknown>).id === "string" &&
-          typeof (t as Record<string, unknown>).title === "string",
-      )
-      .map(normalizeTrip);
+    return coerceTrips(JSON.parse(raw));
   } catch {
     return [];
   }
