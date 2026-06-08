@@ -8,7 +8,7 @@ import { PRIMARY_BUTTON } from "@/lib/ui";
 
 export default function HomePage() {
   const router = useRouter();
-  const { trips, loaded, createTrip, deleteTrip } = useTrips();
+  const { trips, loaded, createTrip, deleteTrip, duplicateTrip } = useTrips();
 
   function handleCreate() {
     const id = createTrip();
@@ -75,14 +75,24 @@ export default function HomePage() {
                       {` ・ 予定 ${spotCount}件`}
                     </span>
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(trip.id, trip.title)}
-                    className="shrink-0 rounded-md px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50"
-                    aria-label={`「${trip.title}」を削除`}
-                  >
-                    削除
-                  </button>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <button
+                      type="button"
+                      onClick={() => duplicateTrip(trip.id)}
+                      className="rounded-md px-3 py-2 text-sm font-bold text-[#0017c1] hover:bg-blue-50"
+                      aria-label={`「${trip.title}」を複製`}
+                    >
+                      複製
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(trip.id, trip.title)}
+                      className="rounded-md px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50"
+                      aria-label={`「${trip.title}」を削除`}
+                    >
+                      削除
+                    </button>
+                  </div>
                 </div>
               </li>
             );

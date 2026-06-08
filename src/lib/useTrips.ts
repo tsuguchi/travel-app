@@ -57,5 +57,35 @@ export function useTrips() {
     updateStore((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  return { trips, loaded, createTrip, updateTrip, deleteTrip };
+  /**
+   * 指定したしおりを複製し、新しい ID を返す。
+   * 日・予定にもすべて新しい ID を振り直し、元の直後に挿入する。
+   */
+  const duplicateTrip = useCallback((id: string): string => {
+    const now = Date.now();
+    const newId = createId();
+    updateStore((prev) => {
+      const index = prev.findIndex((t) => t.id === id);
+      if (index === -1) return prev;
+      const src = prev[index];
+      const copy: Trip = {
+        ...src,
+        id: newId,
+        title: `${src.title}（コピー）`,
+        createdAt: now,
+        updatedAt: now,
+        days: src.days.map((d) => ({
+          ...d,
+          id: createId(),
+          spots: d.spots.map((s) => ({ ...s, id: createId() })),
+        })),
+      };
+      const next = [...prev];
+      next.splice(index + 1, 0, copy);
+      return next;
+    });
+    return newId;
+  }, []);
+
+  return { trips, loaded, createTrip, updateTrip, deleteTrip, duplicateTrip };
 }
