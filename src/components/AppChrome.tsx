@@ -13,8 +13,18 @@ import { FIELD_INPUT, OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/ui";
  * - サインイン済み → children（アプリ本体）
  */
 export default function AppChrome({ children }: { children: React.ReactNode }) {
-  const { user, ready, configured, error, signIn, signInEmail, signUpEmail, signOut } =
-    useAuth();
+  const {
+    user,
+    ready,
+    configured,
+    error,
+    notice,
+    signIn,
+    signInEmail,
+    signUpEmail,
+    resetPassword,
+    signOut,
+  } = useAuth();
 
   return (
     <>
@@ -51,7 +61,9 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
             onSignIn={signIn}
             onSignInEmail={signInEmail}
             onSignUpEmail={signUpEmail}
+            onResetPassword={resetPassword}
             error={error}
+            notice={notice}
           />
         ) : (
           children
@@ -65,12 +77,16 @@ function SignIn({
   onSignIn,
   onSignInEmail,
   onSignUpEmail,
+  onResetPassword,
   error,
+  notice,
 }: {
   onSignIn: () => void;
   onSignInEmail: (email: string, password: string) => void;
   onSignUpEmail: (email: string, password: string) => void;
+  onResetPassword: (email: string) => void;
   error: string | null;
+  notice: string | null;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -88,6 +104,14 @@ function SignIn({
           className="mt-4 rounded-md bg-red-50 p-3 text-sm font-bold text-red-700"
         >
           {error}
+        </p>
+      )}
+      {notice && (
+        <p
+          role="status"
+          className="mt-4 rounded-md bg-green-50 p-3 text-sm font-bold text-green-800"
+        >
+          {notice}
         </p>
       )}
 
@@ -147,6 +171,14 @@ function SignIn({
             新規登録
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => onResetPassword(email)}
+          className="mt-4 text-sm text-[#0017c1] underline"
+        >
+          パスワードを忘れた場合（再設定メールを送信）
+        </button>
       </form>
     </div>
   );
