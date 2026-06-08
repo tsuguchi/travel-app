@@ -3,6 +3,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import type { Trip } from "@/types";
 import { createId } from "@/lib/id";
+import { cloneTripWithNewIds } from "@/lib/trip";
 import {
   getServerSnapshot,
   getSnapshot,
@@ -64,29 +65,47 @@ export function useTrips() {
    */
   const duplicateTrip = useCallback((id: string): string => {
     const now = Date.now();
-    const newId = createId();
+    const copy = { id: "" };
     updateStore((prev) => {
       const index = prev.findIndex((t) => t.id === id);
       if (index === -1) return prev;
-      const src = prev[index];
-      const copy: Trip = {
-        ...src,
-        id: newId,
-        title: `${src.title}（コピー）`,
+      const cloned: Trip = {
+        ...cloneTripWithNewIds(prev[index]),
+        title: `${prev[index].title}（コピー）`,
         createdAt: now,
         updatedAt: now,
-        days: src.days.map((d) => ({
-          ...d,
-          id: createId(),
-          spots: d.spots.map((s) => ({ ...s, id: createId() })),
-        })),
       };
+      copy.id = cloned.id;
       const next = [...prev];
-      next.splice(index + 1, 0, copy);
+      next.splice(index + 1, 0, cloned);
       return next;
     });
-    return newId;
+    return copy.id;
   }, []);
 
-  return { trips, loaded, createTrip, updateTrip, deleteTrip, duplicateTrip };
+  /**
+   * 外部 JSON 由来のしおりを取り込む。既存を壊さないよう ID を振り直し、
+   * 先頭に追加する。取り込んだ件数を返す。
+   */
+  const importTrips = useCallback((incoming: Trip[]): number => {
+    if (incoming.length === 0) return 0;
+    const now = Date.now();
+    const cloned = incoming.map((t) => ({
+      ...cloneTripWithNewIds(t),
+      createdAt: now,
+      updatedAt: now,
+    }));
+    updateStore((prev) => [...cloned, ...prev]);
+    return cloned.length;
+  }, []);
+
+  return {
+    trips,
+    loaded,
+    createTrip,
+    updateTrip,
+    deleteTrip,
+    duplicateTrip,
+    importTrips,
+  };
 }
