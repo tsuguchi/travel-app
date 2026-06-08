@@ -5,8 +5,8 @@ import Link from "next/link";
 import type { ItineraryDay, Spot } from "@/types";
 import { useTrips } from "@/lib/useTrips";
 import { createId } from "@/lib/id";
-import { formatDuration } from "@/lib/date";
-import { FIELD_INPUT, PRIMARY_BUTTON } from "@/lib/ui";
+import { enumerateDates, formatDuration } from "@/lib/date";
+import { FIELD_INPUT, OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/ui";
 import DayCard from "@/components/DayCard";
 
 const fieldInputClass = `mt-1 w-full ${FIELD_INPUT}`;
@@ -61,6 +61,37 @@ export default function TripDetailPage() {
     setDays(t.days.filter((d) => d.id !== dayId));
   }
 
+  /**
+   * 出発日〜帰着日から「○日目」を自動生成し、各日に日付を割り当てる。
+   * 既存の予定は位置（i番目）で引き継ぎ、日付だけ振り直す。
+   * 範囲を超えて消える日に予定がある場合のみ確認する。
+   */
+  function generateDaysFromDates() {
+    const dates = enumerateDates(t.startDate, t.endDate);
+    if (dates.length === 0) return;
+    const droppedHaveSpots = t.days
+      .slice(dates.length)
+      .some((d) => d.spots.length > 0);
+    if (
+      droppedHaveSpots &&
+      !window.confirm(
+        `日程を${dates.length}日で作り直します。範囲を超える日の予定が削除されますが、よろしいですか？`,
+      )
+    ) {
+      return;
+    }
+    setDays(
+      dates.map((date, i) => {
+        const existing = t.days[i];
+        return {
+          id: existing?.id ?? createId(),
+          date,
+          spots: existing?.spots ?? [],
+        };
+      }),
+    );
+  }
+
   function addSpot(dayId: string) {
     const spot: Spot = {
       id: createId(),
@@ -83,6 +114,7 @@ export default function TripDetailPage() {
   }
 
   const duration = formatDuration(t.startDate, t.endDate);
+  const generatableDays = enumerateDates(t.startDate, t.endDate).length;
 
   return (
     <div>
@@ -149,6 +181,21 @@ export default function TripDetailPage() {
         </div>
         {duration && (
           <p className="mt-2 text-sm text-gray-700">期間：{duration}</p>
+        )}
+
+        {generatableDays > 0 && (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={generateDaysFromDates}
+              className={OUTLINE_BUTTON}
+            >
+              出発日から{generatableDays}日分の日程を自動生成
+            </button>
+            <p className="mt-1 text-sm text-gray-700">
+              各日に日付を振り直します。入力済みの予定は引き継がれます。
+            </p>
+          </div>
         )}
       </section>
 
